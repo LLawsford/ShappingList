@@ -1,4 +1,4 @@
-namespace ShappingList.Models.Users
+namespace ShappingList.Models.User
 {
   public class UpdateModel
     {

@@ -1,6 +1,6 @@
 using AutoMapper;
 using ShappingList.Entities;
-using ShappingList.Models.Users;
+using ShappingList.Models.User;
 
 namespace ShappingList.Helpers
 {

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShappingList.Entities;
 using ShappingList.Helpers;
-using ShappingList.Models.Users;
+using ShappingList.Models.User;
 using ShappingList.Services;
 
 namespace ShappingList.Controllers {
@@ -60,6 +60,7 @@ namespace ShappingList.Controllers {
                 Username = user.Username,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                Role = user.Role,
                 Token = tokenString
             });
         }
@@ -84,6 +85,7 @@ namespace ShappingList.Controllers {
             }
         }
 
+        [Authorize(Roles = Role.Admin)]
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -95,14 +97,25 @@ namespace ShappingList.Controllers {
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
+            //only admin can access other users data
+            var currentUserId = int.Parse(User.Identity.Name);
+            if(id != currentUserId && !User.IsInRole(Role.Admin))
+                return Forbid();
+
             var user = _userService.GetById(id);
             var model = _mapper.Map<UserModel>(user);
+
+            if(user == null)
+                return NotFound();
+
             return Ok(model);
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody]UpdateModel model)
         {
+
+            //TODO: only admins and owners of these accounts should be able to update this data
             // map model to entity and set id
             var user = _mapper.Map<User>(model);
             user.Id = id;
@@ -123,10 +136,14 @@ namespace ShappingList.Controllers {
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            //TODO: only admins and owners of these accounts should be able remove them
+
             _userService.Delete(id);
             return Ok();
         }
 
+
+    
 
 
 

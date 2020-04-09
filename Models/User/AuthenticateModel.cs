@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ShappingList.Models.Users
+namespace ShappingList.Models.User
 {
     public class AuthenticateModel
     {

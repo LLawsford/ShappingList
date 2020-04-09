@@ -17,7 +17,10 @@ namespace ShappingList.Helpers
         {
             // connect to sql server database
             options.UseSqlServer(Configuration.GetConnectionString("ShappingListDatabase"));
+
         }
+
+       
 
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
