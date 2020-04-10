@@ -32,37 +32,15 @@ namespace ShappingList.Controllers {
         [HttpPost ("authenticate")]
         public IActionResult Authenticate ([FromBody] AuthenticateModel model) {
 
-            var user = _userService.Authenticate (model.Username, model.Password);
+            var user = _userService.Authenticate(model.Username, model.Password);
 
             if (user == null)
                 return BadRequest (new { message = "no such user in database" });
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes (_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+            
 
             //return basic user info and authentication token 
-            return Ok(new
-            {
-                Id = user.Id,
-                Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Role = user.Role,
-                Token = tokenString
-            });
+            return Ok(user);
         }
 
         [AllowAnonymous]
@@ -97,18 +75,19 @@ namespace ShappingList.Controllers {
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            //only admin can access other users data
+            // only allow admins to access other user records
             var currentUserId = int.Parse(User.Identity.Name);
-            if(id != currentUserId && !User.IsInRole(Role.Admin))
+            if (id != currentUserId && !User.IsInRole(Role.Admin))
                 return Forbid();
 
-            var user = _userService.GetById(id);
-            var model = _mapper.Map<UserModel>(user);
+            var user =  _userService.GetById(id);
 
-            if(user == null)
+            if (user == null)
                 return NotFound();
 
-            return Ok(model);
+            var result = _mapper.Map<UserModel>(user);
+
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
@@ -142,8 +121,9 @@ namespace ShappingList.Controllers {
             return Ok();
         }
 
+     
 
-    
+
 
 
 
