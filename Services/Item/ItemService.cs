@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ShappingList.Entities;
 using ShappingList.Helpers;
@@ -27,6 +29,8 @@ namespace ShappingList.Services
             return item;
         }
 
+       
+
         public IEnumerable<Item> GetAll()
         {
             return _context.Items;
@@ -53,6 +57,19 @@ namespace ShappingList.Services
 
             _context.Items.Remove(item);
             _context.SaveChanges();
+        }
+
+        public Item GetById(int id)
+        {
+
+            var item = _context.Items.Where(i => i.Id == id).FirstOrDefault();
+            
+            if(item == null)
+                throw new AppException("No item with this id");
+
+            return item;
+
+
         }
     }
 }

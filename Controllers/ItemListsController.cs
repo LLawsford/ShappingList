@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using ShappingList.Entities;
 using ShappingList.Helpers;
 using ShappingList.Models.Item;
+using ShappingList.Models.ItemList;
 
 namespace ShappingList.Controllers
 {
@@ -13,35 +14,37 @@ namespace ShappingList.Controllers
     //! [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class ItemsController : ControllerBase
+    public class ItemListsController : ControllerBase
     {
 
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
+        private readonly IItemListService _itemListService;
         private readonly IItemService _itemService;
 
-        public ItemsController(IMapper mapper, IOptions<AppSettings> appSettings, IItemService itemService)
+        public ItemListsController(IMapper mapper, IOptions<AppSettings> appSettings, IItemListService itemListService, IItemService itemService)
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
+            _itemListService = itemListService;
             _itemService = itemService;
         }
 
         //! [Authorize]
         [HttpPost("new")]
-        public IActionResult Create([FromBody]ItemModel model)
+        public IActionResult Create([FromBody]ItemListModel model)
         {
 
 
             // map model to entity
-            var item = _mapper.Map<Item>(model);
+            var itemList = _mapper.Map<ItemList>(model);
 
 
             try
             {
                 // create item
-                _itemService.Create(item);
-                return Ok(item);
+                _itemListService.Create(itemList);
+                return Ok(itemList);
             }
             catch (AppException ex)
             {
@@ -56,35 +59,23 @@ namespace ShappingList.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var items = _itemService.GetAll();
-            return Ok(items);
-        }
-
-        //! [Authorize]
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var item = _itemService.GetById(id);
-            
-            if(item == null)
-                return NotFound();
-
-            return Ok(item);
+            var itemLists = _itemListService.GetAll();
+            return Ok(itemLists);
         }
 
         //! [Authorize]
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]ItemUpdateModel model )
+        public IActionResult Update(int id, [FromBody]ItemListUpdateModel model )
         {
 
             // map model to entity and set id
-            var item = _mapper.Map<Item>(model);
-            item.Id = id;
+            var itemList = _mapper.Map<ItemList>(model);
+            itemList.Id = id;
 
             try
             {
-                // update item 
-                _itemService.Update(item);
+                // update item list
+                _itemListService.Update(itemList);
                 return Ok();
             }
             catch (AppException ex)
@@ -100,11 +91,31 @@ namespace ShappingList.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _itemService.Delete(id);
+            _itemListService.Delete(id);
             return Ok();
         }
+
+        //! [Authorize]
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var itemList = _itemListService.GetById(id);
+            return Ok(itemList);
+        }
         
+        [HttpPost("{id}/items/new")]
+        public IActionResult AddItem(int id, [FromBody]ItemModel model)
+        {
+            var item = _mapper.Map<Item>(model);
+            var list = _itemListService.GetById(id);
+
+            item.List = list;
 
 
+            _itemService.Create(item);
+
+
+            return Ok(list);
+        }
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using ShappingList.Helpers;
 using ShappingList.Services;
 
+
 namespace ShappingList
 {
     public class Startup
@@ -29,12 +30,15 @@ namespace ShappingList
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            
             services.AddDbContext<DataContext>();
 
             // use sql server db in production and sqlite db in development
             
             services.AddCors();
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // configure strongly typed settings objects
@@ -80,6 +84,7 @@ namespace ShappingList
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IItemListService, ItemListService>();
 
         }
 
