@@ -79,6 +79,7 @@ namespace ShappingList
 
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IItemService, ItemService>();
 
         }
 

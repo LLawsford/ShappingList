@@ -1,19 +1,14 @@
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using ShappingList.Entities;
 using ShappingList.Helpers;
 using ShappingList.Models.User;
-using ShappingList.Services;
 
-namespace ShappingList.Controllers {
+namespace ShappingList.Controllers
+{
     [Authorize]
     [ApiController]
     [Route ("[controller]")]
@@ -40,6 +35,7 @@ namespace ShappingList.Controllers {
             
 
             //return basic user info and authentication token 
+            //TODO: information returned below is all user data -> it contains hashed password and salted password. Map it to model without sensitive data.
             return Ok(user);
         }
 
@@ -91,7 +87,7 @@ namespace ShappingList.Controllers {
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UpdateModel model)
+        public IActionResult Update(int id, [FromBody]UserUpdateModel model)
         {
 
             //TODO: only admins and owners of these accounts should be able to update this data

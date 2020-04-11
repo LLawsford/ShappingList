@@ -1,10 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ShappingList.Models.Item
 {
-  public class ItemModel
+  public class ItemUpdateModel
     {
-        [Required]
         public string ItemName { get; set; }
     }
 }

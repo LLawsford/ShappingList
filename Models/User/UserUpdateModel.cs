@@ -1,6 +1,6 @@
 namespace ShappingList.Models.User
 {
-  public class UpdateModel
+  public class UserUpdateModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
