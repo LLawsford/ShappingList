@@ -22,6 +22,9 @@ namespace ShappingList.Services
             _appSettings = appSettings.Value;
         }
 
+
+        //TODO: OPTIONAL (create regions in code, especially in UserService)
+
         public User Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -40,13 +43,20 @@ namespace ShappingList.Services
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[] 
+
+            //Claims for subject -> now these could be optional. E.g user don't have to have a role
+
+            var claims = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
-                }),
+                });
+
+            if(user.Role != null)
+                claims.AddClaim(new Claim(ClaimTypes.Role, user.Role));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = claims,
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

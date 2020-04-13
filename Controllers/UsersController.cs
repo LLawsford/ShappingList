@@ -32,11 +32,12 @@ namespace ShappingList.Controllers
             if (user == null)
                 return BadRequest (new { message = "no such user in database" });
 
-            
+
 
             //return basic user info and authentication token 
             //TODO: information returned below is all user data -> it contains hashed password and salted password. Map it to model without sensitive data.
-            return Ok(user);
+            var result = _mapper.Map<UserModel>(user);
+            return Ok(result);
         }
 
         [AllowAnonymous]
@@ -50,7 +51,7 @@ namespace ShappingList.Controllers
             {
                 // create user
                 _userService.Create(user, model.Password);
-                return Ok();
+                return Ok($"{user.Username} created");
             }
             catch (AppException ex)
             {

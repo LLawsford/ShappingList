@@ -85,6 +85,7 @@ namespace ShappingList
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IItemListService, ItemListService>();
+            services.AddScoped<IUserGroupService, UserGroupService>();
 
         }
 

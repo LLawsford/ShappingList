@@ -3,6 +3,7 @@ using ShappingList.Entities;
 using ShappingList.Models.Item;
 using ShappingList.Models.User;
 using ShappingList.Models.ItemList;
+using ShappingList.Models.UserGroup;
 
 namespace ShappingList.Helpers
 {
@@ -24,6 +25,10 @@ namespace ShappingList.Helpers
             //itemlist maps
             CreateMap<ItemList, ItemListModel>().ReverseMap();
             CreateMap<ItemListUpdateModel, ItemList>();
+
+            //usergroup maps
+            CreateMap<UserGroup, UserGroupModel>().ReverseMap();
+            CreateMap<UserGroupUpdateModel, UserGroup>();
         }
     }
 }

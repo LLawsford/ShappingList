@@ -65,7 +65,7 @@ namespace ShappingList.Controllers
 
         //! [Authorize]
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]ItemListUpdateModel model )
+        public IActionResult Update(int id, [FromBody]ItemListUpdateModel model)
         {
 
             // map model to entity and set id
@@ -102,18 +102,35 @@ namespace ShappingList.Controllers
             var itemList = _itemListService.GetById(id);
             return Ok(itemList);
         }
-        
+
+
+        //! [Authorize]
         [HttpPost("{id}/items/new")]
         public IActionResult AddItem(int id, [FromBody]ItemModel model)
         {
             var item = _mapper.Map<Item>(model);
             var list = _itemListService.GetById(id);
 
+
+            //? Maybe there's better way to assign list to item than on a controller side. 
+            //? Something better than override for Create method that takes list argument?
+
+            //TODO: Cover all endpoints, nulls etc. in controllers and services later on! 
+            //TODO: Try-catches! 
             item.List = list;
 
 
             _itemService.Create(item);
 
+
+            return Ok(list);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteItem([FromQuery]int listId, [FromQuery]int itemId)
+        {
+            var list = _itemListService.GetById(listId);
+            _itemService.Delete(itemId);
 
             return Ok(list);
         }
