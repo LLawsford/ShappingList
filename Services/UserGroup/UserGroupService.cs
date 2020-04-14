@@ -36,7 +36,7 @@ namespace ShappingList.Services
         {
             var group = _context.UserGroups.Where(ug => ug.Id == id).Include(ug => ug.Users).Include(ug => ug.ItemList).FirstOrDefault();
 
-            if(group==null)
+            if (group == null)
                 throw new AppException("Group not found");
 
             return group;
@@ -79,10 +79,13 @@ namespace ShappingList.Services
             var group = _context.UserGroups.Find(userGroupId);
             var user = _context.Users.Find(userId);
 
-            if(user == null || group == null)
+            if (user == null || group == null)
                 throw new AppException("no such user or group");
 
-            group.Users = new List<User>();
+            //check if list of users exists?? 
+            if (group.Users == null)
+                group.Users = new List<User>();
+
             group.Users.Add(user);
 
             _context.SaveChanges();
@@ -94,10 +97,10 @@ namespace ShappingList.Services
             var group = _context.UserGroups.Find(userGroupId);
             var user = _context.Users.Find(userId);
 
-            if(user == null || group == null)
+
+            if (user == null || group == null)
                 throw new AppException("no such user or group");
 
-            
             group.Users.Remove(user);
 
             _context.SaveChanges();

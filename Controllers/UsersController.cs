@@ -25,12 +25,20 @@ namespace ShappingList.Controllers
 
         [AllowAnonymous]
         [HttpPost ("authenticate")]
-        public IActionResult Authenticate ([FromBody] AuthenticateModel model) {
+        public IActionResult Authenticate ([FromBody] AuthenticateModel model) 
+        {
+
+
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
 
             var user = _userService.Authenticate(model.Username, model.Password);
 
             if (user == null)
-                return BadRequest (new { message = "no such user in database" });
+                return BadRequest (new { message = "no such user in the database" });
 
 
 
@@ -38,12 +46,22 @@ namespace ShappingList.Controllers
             //TODO: information returned below is all user data -> it contains hashed password and salted password. Map it to model without sensitive data.
             var result = _mapper.Map<UserModel>(user);
             return Ok(result);
+            }
+            catch(AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody]RegisterModel model)
         {
+
+            
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // map model to entity
             var user = _mapper.Map<User>(model);
 
@@ -60,36 +78,54 @@ namespace ShappingList.Controllers
             }
         }
 
-        [Authorize(Roles = Role.Admin)]
+        //[Authorize(Roles = Role.Admin)]
         [HttpGet]
         public IActionResult GetAll()
         {
-            var users = _userService.GetAll();
-            var model = _mapper.Map<IList<UserModel>>(users);
-            return Ok(model);
+            try
+            {
+
+                var users = _userService.GetAll();
+                var model = _mapper.Map<IList<UserModel>>(users);
+                return Ok(model);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
+
             // only allow admins to access other user records
             var currentUserId = int.Parse(User.Identity.Name);
             if (id != currentUserId && !User.IsInRole(Role.Admin))
                 return Forbid();
 
-            var user =  _userService.GetById(id);
+            try
+            {
+                var user = _userService.GetById(id);
 
-            if (user == null)
-                return NotFound();
+                if (user == null)
+                    return NotFound();
 
-            var result = _mapper.Map<UserModel>(user);
+                var result = _mapper.Map<UserModel>(user);
 
-            return Ok(result);
+                return Ok(user);
+            }
+            catch(AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody]UserUpdateModel model)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             //TODO: only admins and owners of these accounts should be able to update this data
             // map model to entity and set id
@@ -113,16 +149,16 @@ namespace ShappingList.Controllers
         public IActionResult Delete(int id)
         {
             //TODO: only admins and owners of these accounts should be able remove them
-
-            _userService.Delete(id);
-            return Ok();
+            try
+            {
+                _userService.Delete(id);
+                return Ok();
+            }
+            catch(AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
         }
-
-     
-
-
-
-
 
     }
 }

@@ -33,6 +33,9 @@ namespace ShappingList.Controllers
         {
 
 
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // map model to entity
             var item = _mapper.Map<Item>(model);
 
@@ -56,20 +59,41 @@ namespace ShappingList.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var items = _itemService.GetAll();
-            return Ok(items);
+            
+
+            try
+            {
+                var items = _itemService.GetAll();
+                return Ok(items);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         //! [Authorize]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var item = _itemService.GetById(id);
             
-            if(item == null)
-                return NotFound();
 
-            return Ok(item);
+
+            try
+            {
+                var item = _itemService.GetById(id);
+            
+                if(item == null)
+                    return NotFound();
+
+                return Ok(item);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         //! [Authorize]
@@ -77,6 +101,10 @@ namespace ShappingList.Controllers
         public IActionResult Update(int id, [FromBody]ItemUpdateModel model )
         {
 
+
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+                
             // map model to entity and set id
             var item = _mapper.Map<Item>(model);
             item.Id = id;
@@ -100,8 +128,18 @@ namespace ShappingList.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _itemService.Delete(id);
-            return Ok();
+            
+
+            try
+            {
+                _itemService.Delete(id);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
         
 

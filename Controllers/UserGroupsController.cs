@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using ShappingList.Entities;
@@ -17,7 +18,6 @@ namespace ShappingList.Controllers
     [Route("[controller]")]
     public class UserGroupsController : ControllerBase
     {
-
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly IUserGroupService _userGroupService;
@@ -35,10 +35,14 @@ namespace ShappingList.Controllers
             _itemListService = itemListService;
         }
 
-        //! [Authorize]
+        [Authorize(Roles = Role.Admin)]
         [HttpPost("new")]
         public IActionResult Create(UserGroupModel model)
         {
+
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var userGroup = _mapper.Map<UserGroupModel, UserGroup>(model);
 
             try
@@ -53,24 +57,53 @@ namespace ShappingList.Controllers
             }
         }
 
-        //! [Authorize]
+        
+        //TODO: User groups controller can be accessed only by loged in users. 
+        //TODO: Users can manipulate data here if: 
+            // They have admin role
+            // They have manager role (beside manipulating items) and list.Users contains current user with that role
+
+        //! [Authorize(Roles = Role.Admin)]
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_userGroupService.GetAll());
+
+            try
+            {
+                return Ok(_userGroupService.GetAll());
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         //! [Authorize]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            return Ok(_userGroupService.GetById(id));
+
+
+            try
+            {
+                return Ok(_userGroupService.GetById(id));
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody]UserGroupModel model)
         {
+
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+                
             var userGroup = _mapper.Map<UserGroup>(model);
             userGroup.Id = id;
 
@@ -93,41 +126,83 @@ namespace ShappingList.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _userGroupService.Delete(id);
-            return Ok();
+            
+            //TODO: some kind of ListManager role to handle stuff like this
+            try
+            {
+                _userGroupService.Delete(id);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         //! [Authorize]
         [HttpPost("{userGroupId}/users/{userId}")]
         public IActionResult AddUser(int userGroupId, int userId)
         {
-            _userGroupService.AddUser(userGroupId, userId);
+            //? maybe there should be some form of invitations/requests to join groups
+            try
+            {
+                _userGroupService.AddUser(userGroupId, userId);
+                var group = _userGroupService.GetById(userGroupId);
 
-            var group = _userGroupService.GetById(userGroupId);
-
-            return Ok(group);
+                return Ok(group);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpDelete("{userGroupId}/users/{userId}")]
         public IActionResult RemoveUser(int userGroupId, int userId)
         {
-            _userGroupService.RemoveUser(userGroupId, userId);
+            try
+            {
 
-            var group = _userGroupService.GetById(userGroupId);
-
-            return Ok(group);
+                _userGroupService.RemoveUser(userGroupId, userId);
+    
+                var group = _userGroupService.GetById(userGroupId);
+    
+                return Ok(group);
+            }
+            catch(AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
         }
 
         [HttpPost("{userGroupId}/itemlists/new")]
         public IActionResult AddItemList(int userGroupId, [FromBody] ItemListModel model)
         {
+
+            
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+                
             var itemList = _mapper.Map<ItemList>(model);
-            var group = _userGroupService.GetById(userGroupId);
+            
 
-            _itemListService.Create(itemList);
-            group.ItemList = itemList;
 
-            return Ok(group);
+            try
+            {
+
+                var group = _userGroupService.GetById(userGroupId);
+
+                _itemListService.Create(itemList);
+                group.ItemList = itemList;
+
+                return Ok(group);
+            }
+            catch(AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
 
 
         }

@@ -22,7 +22,7 @@ namespace ShappingList.Services
             _appSettings = appSettings.Value;
         }
 
-
+        //? Maybe there should be Model.IsValid before each try-catch in controllers
         //TODO: OPTIONAL (create regions in code, especially in UserService)
 
         public User Authenticate(string username, string password)
