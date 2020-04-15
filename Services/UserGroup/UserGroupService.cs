@@ -97,7 +97,6 @@ namespace ShappingList.Services
             var group = _context.UserGroups.Find(userGroupId);
             var user = _context.Users.Find(userId);
 
-
             if (user == null || group == null)
                 throw new AppException("no such user or group");
 

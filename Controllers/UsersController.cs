@@ -78,7 +78,7 @@ namespace ShappingList.Controllers
             }
         }
 
-        //[Authorize(Roles = Role.Admin)]
+        [Authorize(Roles = Role.Admin)]
         [HttpGet]
         public IActionResult GetAll()
         {
