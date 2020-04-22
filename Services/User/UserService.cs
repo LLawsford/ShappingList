@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShappingList.Entities;
@@ -47,11 +48,11 @@ namespace ShappingList.Services
             //Claims for subject -> now these could be optional. E.g user don't have to have a role
 
             var claims = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                });
+            {
+                new Claim(ClaimTypes.Name, user.Id.ToString()),
+            });
 
-            if(user.Role != null)
+            if (user.Role != null)
                 claims.AddClaim(new Claim(ClaimTypes.Role, user.Role));
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -68,12 +69,12 @@ namespace ShappingList.Services
 
         public IEnumerable<User> GetAll()
         {
-            return _context.Users;
+            return _context.Users.Include(u => u.Invitations).Include(u => u.Group);
         }
 
         public User GetById(int id)
         {
-            return _context.Users.Find(id);
+            return _context.Users.Where(x => x.Id == id).Include(u => u.Invitations).Include(u => u.Group).FirstOrDefault();
         }
 
         public User Create(User user, string password)
@@ -152,7 +153,7 @@ namespace ShappingList.Services
             if (password == null) throw new ArgumentNullException("password");
             if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
 
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            using(var hmac = new System.Security.Cryptography.HMACSHA512())
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
@@ -166,7 +167,7 @@ namespace ShappingList.Services
             if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
             if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
 
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
+            using(var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 for (int i = 0; i < computedHash.Length; i++)
@@ -176,6 +177,38 @@ namespace ShappingList.Services
             }
 
             return true;
+        }
+
+        public void AcceptInvitation(int invitationId)
+        {
+            var invitation = _context.Invitations.Find(invitationId);
+
+            if (invitation == null)
+                throw new AppException("no such invitation");
+
+            invitation.IsAccepted = true;
+            invitation.User.Group = invitation.UserGroup;
+            _context.SaveChanges();
+            _context.Invitations.Remove(invitation);
+
+            _context.SaveChanges();
+        }
+
+        public void DeclineInvitation(int invitationId)
+        {
+            var invitation = _context.Invitations.Find(invitationId);
+
+            if (invitation == null)
+                throw new AppException("no such invitation");
+
+            _context.Invitations.Remove(invitation);
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<Invitation> ShowAllInvitations(int userId)
+        {
+            var invitations = _context.Invitations.Where(i => i.User.Id == userId);
+            return invitations;
         }
     }
 }

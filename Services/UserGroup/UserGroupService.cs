@@ -105,5 +105,41 @@ namespace ShappingList.Services
             _context.SaveChanges();
             return group;
         }
+
+        public Invitation AddInvitation(int userId, int userGroupId)
+        {
+            var user = _context.Users.Find(userId);
+            var userGroup = _context.UserGroups.Find(userGroupId);
+
+            if (user == null || userGroup == null)
+                throw new AppException("No such user or group");
+
+            var invitation = new Invitation
+            {
+                User = user,
+                UserGroup = userGroup
+            };
+
+            _context.Invitations.Add(invitation);
+            _context.SaveChanges();
+
+            user.Invitations.Add(invitation);
+
+            return invitation;
+
+        }
+
+        public void RemoveInvitation(int id)
+        {
+            var invitation = _context.Invitations.Find(id);
+
+            if (invitation == null)
+                throw new AppException("no such invitation");
+
+            _context.Invitations.Remove(invitation);
+            _context.SaveChanges();
+        }
+
+       
     }
 }

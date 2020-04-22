@@ -10,8 +10,8 @@ using ShappingList.Helpers;
 namespace ShappingList.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200410110331_RolesCorrection")]
-    partial class RolesCorrection
+    [Migration("20200422152819_ShappingListDB")]
+    partial class ShappingListDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,31 @@ namespace ShappingList.Migrations
                 .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("ShappingList.Entities.Invitation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("UserGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserGroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Invitations");
+                });
 
             modelBuilder.Entity("ShappingList.Entities.Item", b =>
                 {
@@ -69,6 +94,9 @@ namespace ShappingList.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
@@ -84,15 +112,12 @@ namespace ShappingList.Migrations
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserGroupId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Username")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserGroupId");
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Users");
                 });
@@ -117,6 +142,17 @@ namespace ShappingList.Migrations
                     b.ToTable("UserGroups");
                 });
 
+            modelBuilder.Entity("ShappingList.Entities.Invitation", b =>
+                {
+                    b.HasOne("ShappingList.Entities.UserGroup", "UserGroup")
+                        .WithMany()
+                        .HasForeignKey("UserGroupId");
+
+                    b.HasOne("ShappingList.Entities.User", "User")
+                        .WithMany("Invitations")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("ShappingList.Entities.Item", b =>
                 {
                     b.HasOne("ShappingList.Entities.ItemList", "List")
@@ -126,9 +162,9 @@ namespace ShappingList.Migrations
 
             modelBuilder.Entity("ShappingList.Entities.User", b =>
                 {
-                    b.HasOne("ShappingList.Entities.UserGroup", null)
+                    b.HasOne("ShappingList.Entities.UserGroup", "Group")
                         .WithMany("Users")
-                        .HasForeignKey("UserGroupId");
+                        .HasForeignKey("GroupId");
                 });
 
             modelBuilder.Entity("ShappingList.Entities.UserGroup", b =>

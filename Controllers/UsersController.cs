@@ -11,43 +11,42 @@ namespace ShappingList.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route ("[controller]")]
-    public class UsersController : ControllerBase {
+    [Route("[controller]")]
+    public class UsersController : ControllerBase
+    {
         private IUserService _userService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
-        public UsersController (IUserService userService, IMapper mapper, IOptions<AppSettings> appSettings) {
+        public UsersController(IUserService userService, IMapper mapper, IOptions<AppSettings> appSettings)
+        {
             _userService = userService;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
-        [HttpPost ("authenticate")]
-        public IActionResult Authenticate ([FromBody] AuthenticateModel model) 
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody] AuthenticateModel model)
         {
 
-
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
 
-            var user = _userService.Authenticate(model.Username, model.Password);
+                var user = _userService.Authenticate(model.Username, model.Password);
 
-            if (user == null)
-                return BadRequest (new { message = "no such user in the database" });
+                if (user == null)
+                    return BadRequest(new { message = "no such user in the database" });
 
-
-
-            //return basic user info and authentication token 
-            //TODO: information returned below is all user data -> it contains hashed password and salted password. Map it to model without sensitive data.
-            var result = _mapper.Map<UserModel>(user);
-            return Ok(result);
+                //return basic user info and authentication token 
+                //TODO: information returned below is all user data -> it contains hashed password and salted password. Map it to model without sensitive data.
+                var result = _mapper.Map<UserModel>(user);
+                return Ok(result);
             }
-            catch(AppException ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { message = ex });
             }
@@ -55,11 +54,10 @@ namespace ShappingList.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody]RegisterModel model)
+        public IActionResult Register([FromBody] RegisterModel model)
         {
 
-            
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             // map model to entity
@@ -78,7 +76,7 @@ namespace ShappingList.Controllers
             }
         }
 
-        [Authorize(Roles = Role.Admin)]
+        [Authorize]
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -115,16 +113,16 @@ namespace ShappingList.Controllers
 
                 return Ok(user);
             }
-            catch(AppException ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { message = ex });
             }
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UserUpdateModel model)
+        public IActionResult Update(int id, [FromBody] UserUpdateModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             //TODO: only admins and owners of these accounts should be able to update this data
@@ -154,7 +152,51 @@ namespace ShappingList.Controllers
                 _userService.Delete(id);
                 return Ok();
             }
-            catch(AppException ex)
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
+        }
+
+        [HttpPost("{userId}/invitations/{invitationId}/accept")]
+        public IActionResult AcceptInvitation(int invitationId)
+        {
+            try
+            {
+                _userService.AcceptInvitation(invitationId);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
+
+        }
+
+        [HttpPost("{userId}/invitations/{invitationId}/decline")]
+        public IActionResult DeclineInvitation(int invitationId)
+        {
+            try
+            {
+                _userService.DeclineInvitation(invitationId);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex });
+            }
+
+        }
+
+        [HttpGet("{userId}/invitations")]
+        public IActionResult ShowAllInvitations(int userId)
+        {
+            try
+            {
+                var invitations = _userService.ShowAllInvitations(userId);
+                return Ok(invitations);
+            }
+            catch (AppException ex)
             {
                 return BadRequest(new { message = ex });
             }

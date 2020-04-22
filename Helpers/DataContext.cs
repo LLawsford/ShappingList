@@ -20,11 +20,10 @@ namespace ShappingList.Helpers
 
         }
 
-       
-
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
-        public DbSet<ItemList> ItemLists  { get; set; }
+        public DbSet<ItemList> ItemLists { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Invitation> Invitations { get; set; }
     }
 }

@@ -10,8 +10,10 @@ import { AppComponent } from "./app.component";
 import { appRoutingModule } from "./app.routing";
 
 import { JwtInterceptor, ErrorInterceptor } from "./_helpers";
-import { HomeComponent } from "./home";
-import { LoginComponent } from "./login";
+import { HomeComponent } from "./_components/home";
+import { LoginComponent } from "./_components/login";
+import { UserListComponent } from "./_components/users/user-list/user-list.component";
+import { UserDetailsComponent } from "./_components/users/user-details/user-details.component";
 
 @NgModule({
   imports: [
@@ -20,7 +22,14 @@ import { LoginComponent } from "./login";
     HttpClientModule,
     appRoutingModule,
   ],
-  declarations: [AppComponent, HomeComponent, LoginComponent],
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    LoginComponent,
+    UserListComponent,
+    UserDetailsComponent,
+  ],
+
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

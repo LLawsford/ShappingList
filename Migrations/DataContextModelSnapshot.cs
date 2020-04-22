@@ -19,6 +19,31 @@ namespace ShappingList.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("ShappingList.Entities.Invitation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("UserGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserGroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Invitations");
+                });
+
             modelBuilder.Entity("ShappingList.Entities.Item", b =>
                 {
                     b.Property<int>("Id")
@@ -113,6 +138,17 @@ namespace ShappingList.Migrations
                     b.HasIndex("ItemListId");
 
                     b.ToTable("UserGroups");
+                });
+
+            modelBuilder.Entity("ShappingList.Entities.Invitation", b =>
+                {
+                    b.HasOne("ShappingList.Entities.UserGroup", "UserGroup")
+                        .WithMany()
+                        .HasForeignKey("UserGroupId");
+
+                    b.HasOne("ShappingList.Entities.User", "User")
+                        .WithMany("Invitations")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("ShappingList.Entities.Item", b =>

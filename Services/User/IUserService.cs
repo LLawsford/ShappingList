@@ -9,4 +9,8 @@ public interface IUserService
     User Create(User user, string password);
     void Update(User user, string password = null);
     void Delete(int id);
+
+    void AcceptInvitation(int invitationId);
+    void DeclineInvitation(int invitationId);
+    IEnumerable<Invitation> ShowAllInvitations(int userId);
 }

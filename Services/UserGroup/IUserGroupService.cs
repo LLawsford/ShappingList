@@ -13,4 +13,6 @@ public interface IUserGroupService
     UserGroup AddUser(int userGroupId, int userId);
     UserGroup RemoveUser(int userGroupId, int userId);
 
+    Invitation AddInvitation(int userId, int userGroupId);
+    void RemoveInvitation(int id);
 }

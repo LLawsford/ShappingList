@@ -12,7 +12,6 @@ using ShappingList.Models.UserGroup;
 namespace ShappingList.Controllers
 {
 
-
     //! [Authorize]
     [ApiController]
     [Route("[controller]")]
@@ -40,7 +39,7 @@ namespace ShappingList.Controllers
         public IActionResult Create(UserGroupModel model)
         {
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var userGroup = _mapper.Map<UserGroupModel, UserGroup>(model);
@@ -51,17 +50,16 @@ namespace ShappingList.Controllers
 
                 return Ok(userGroup);
             }
-            catch(AppException ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { message = ex });
             }
         }
 
-        
         //TODO: User groups controller can be accessed only by loged in users. 
         //TODO: Users can manipulate data here if: 
-            // They have admin role
-            // They have manager role (beside manipulating items) and list.Users contains current user with that role
+        // They have admin role
+        // They have manager role (beside manipulating items) and list.Users contains current user with that role
 
         //! [Authorize(Roles = Role.Admin)]
         [HttpGet]
@@ -84,7 +82,6 @@ namespace ShappingList.Controllers
         public IActionResult GetById(int id)
         {
 
-
             try
             {
                 return Ok(_userGroupService.GetById(id));
@@ -96,14 +93,13 @@ namespace ShappingList.Controllers
             }
         }
 
-
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UserGroupModel model)
+        public IActionResult Update(int id, [FromBody] UserGroupModel model)
         {
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-                
+
             var userGroup = _mapper.Map<UserGroup>(model);
             userGroup.Id = id;
 
@@ -121,12 +117,11 @@ namespace ShappingList.Controllers
 
         }
 
-        
         //! [Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            
+
             //TODO: some kind of ListManager role to handle stuff like this
             try
             {
@@ -142,15 +137,15 @@ namespace ShappingList.Controllers
 
         //! [Authorize]
         [HttpPost("{userGroupId}/users/{userId}")]
-        public IActionResult AddUser(int userGroupId, int userId)
+        public IActionResult InviteUser(int userGroupId, int userId)
         {
             //? maybe there should be some form of invitations/requests to join groups
             try
             {
-                _userGroupService.AddUser(userGroupId, userId);
-                var group = _userGroupService.GetById(userGroupId);
+                _userGroupService.AddInvitation(userGroupId, userId);
+                
 
-                return Ok(group);
+                return Ok($"Invitation sent to user with Id: {userId}");
             }
             catch (AppException ex)
             {
@@ -166,12 +161,12 @@ namespace ShappingList.Controllers
             {
 
                 _userGroupService.RemoveUser(userGroupId, userId);
-    
+
                 var group = _userGroupService.GetById(userGroupId);
-    
+
                 return Ok(group);
             }
-            catch(AppException ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { message = ex });
             }
@@ -181,13 +176,10 @@ namespace ShappingList.Controllers
         public IActionResult AddItemList(int userGroupId, [FromBody] ItemListModel model)
         {
 
-            
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-                
-            var itemList = _mapper.Map<ItemList>(model);
-            
 
+            var itemList = _mapper.Map<ItemList>(model);
 
             try
             {
@@ -199,12 +191,12 @@ namespace ShappingList.Controllers
 
                 return Ok(group);
             }
-            catch(AppException ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { message = ex });
             }
 
-
         }
+
     }
 }
