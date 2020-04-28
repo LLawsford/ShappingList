@@ -91,3 +91,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+
+#.net core 
+appsettings.Development.json
+appsettings.json
