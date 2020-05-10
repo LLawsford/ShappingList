@@ -1,0 +1,21 @@
+<div *ngIf="userGroup">
+  <table class="table">
+    <tr>
+      <th>Id</th>
+      <th>Group name</th>
+    
+    </tr>
+    <tr>
+      <td>{{ userGroup.id }}</td>
+      <td>{{ userGroup.groupName }}</td>
+    </tr>
+  </table>
+
+  <h3>Members: </h3>
+<div *ngFor="let user of userGroup.users">
+  {{user.username}}
+</div>
+
+<button class="btn btn-success" (click)="invitationToggle()">Invite new member</button>
+<app-invitation-new *ngIf="invitationComponentVisible" userGroupId="{{userGroup.id}}"></app-invitation-new>
+</div>

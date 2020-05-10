@@ -121,9 +121,10 @@ namespace ShappingList.Services
             };
 
             _context.Invitations.Add(invitation);
-            _context.SaveChanges();
-
             user.Invitations.Add(invitation);
+
+            _context.SaveChanges();
+            
 
             return invitation;
 

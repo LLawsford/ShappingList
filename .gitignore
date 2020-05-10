@@ -94,5 +94,5 @@ Thumbs.db
 
 
 #.net core 
-appsettings.Development.json
 appsettings.json
+appsettings.Development.json

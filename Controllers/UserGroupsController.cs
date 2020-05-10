@@ -142,7 +142,7 @@ namespace ShappingList.Controllers
             //? maybe there should be some form of invitations/requests to join groups
             try
             {
-                _userGroupService.AddInvitation(userGroupId, userId);
+                _userGroupService.AddInvitation(userId, userGroupId);
                 
 
                 return Ok($"Invitation sent to user with Id: {userId}");

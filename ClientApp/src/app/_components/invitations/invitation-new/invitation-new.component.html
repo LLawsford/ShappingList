@@ -1,0 +1,20 @@
+<form [formGroup]="invitationForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="userId">User ID</label>
+      <input
+        type="text"
+        formControlName="userId"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': submitted && f.userId.errors }"
+      />
+      <div *ngIf="submitted && f.userId.errors" class="invalid-feedback">
+        <div *ngIf="f.userId.errors.required">User ID is required for invitation</div>
+      </div>
+    </div>
+  
+   
+    <div *ngIf="error" class="alert alert-danger mt-3 mb-0">
+      {{ error }}
+    </div>
+    <button class="btn btn-success" (click)="onSubmit()">+</button>
+  </form>

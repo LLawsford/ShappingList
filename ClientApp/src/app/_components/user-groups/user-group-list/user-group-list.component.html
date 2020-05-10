@@ -1,0 +1,9 @@
+<ul class="list-group">
+  <li
+    *ngFor="let userGroup of userGroups"
+    class="list-group-item"
+    (click)="onSelect(userGroup)"
+  >
+    {{ userGroup.groupName }}
+  </li>
+</ul>

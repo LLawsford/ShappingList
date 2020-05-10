@@ -1,4 +1,6 @@
 ﻿import { Role } from "./role";
+import { UserGroup } from './user-group';
+import { Invitation } from './invitation';
 export class User {
   id: number;
   username: string;
@@ -7,4 +9,6 @@ export class User {
   lastName: string;
   token?: string;
   role?: Role;
+  group?: UserGroup;
+  invitations: Invitation[];
 }

@@ -4,6 +4,10 @@
     <a class="nav-item nav-link" routerLink="/">Home</a>
     <a class="nav-item nav-link" (click)="logout()">Logout</a>
     <a class="nav-item nav-link" routerLink="/users" *ngIf="isAdmin">Users</a>
+    <a class="nav-item nav-link" routerLink="/userGroups" *ngIf="isAdmin">Groups</a>
+    <a class="nav-item nav-link" [routerLink]="['userGroups', currentUser.group.id]" *ngIf="!isAdmin && currentUser.group">My group</a>
+    <a class="nav-item nav-link" [routerLink]="['users', currentUser.id, 'invitations']">Invitations</a>
+    
   </div>
 </nav>
 
